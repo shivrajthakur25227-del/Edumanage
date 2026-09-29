@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Academic Results | Student Management System{% endblock %}
+{% block header_title %}Examination Results{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title">Academic Results & Grade Sheets</h1>
+            <p class="page-subtitle">Consolidated academic performance, cumulative marks, percentages, and letter grades.</p>
+        </div>
+        <div class="page-header-actions">
+            <button onclick="window.print()" class="btn btn-outline print-hide">
+                <span>🖨️ Print Consolidated Sheet</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card filter-card print-hide">
+        <form method="GET" action="{{ url_for('results') }}" class="filter-form">
+            <div class="filter-field">
+                <label for="courseFilter" class="filter-label">Filter by Course</label>
+                <select id="courseFilter" name="course" class="form-control">
+                    <option value="">All Courses</option>
+                    {% for c in all_courses %}
+                        <option value="{{ c }}" {% if course_filter == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="semesterFilter" class="filter-label">Filter by Semester</label>
+                <select id="semesterFilter" name="semester" class="form-control">
+                    <option value="">All Semesters</option>
+                    {% for s in all_semesters %}
+                        <option value="{{ s }}" {% if semester_filter|string == s|string %}selected{% endif %}>Semester {{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                {% if course_filter or semester_filter %}
+                    <a href="{{ url_for('results') }}" class="btn btn-secondary">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            {% if results %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Student Name</th>
+                            <th>Course</th>
+                            <th>Semester</th>
+                            <th style="text-align: center;">Subjects</th>
+                            <th style="text-align: right;">Total Marks</th>
+                            <th style="text-align: right;">Percentage</th>
+                            <th style="text-align: center;">Grade</th>
+                            <th style="text-align: center;">Status</th>
+                            <th class="print-hide" style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-subtle font-mono font-bold">{{ r.student.roll_number }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ r.student.name }}</strong>
+                                </td>
+                                <td>{{ r.student.course }}</td>
+                                <td><span class="sem-badge">Sem {{ r.student.semester }}</span></td>
+                                <td style="text-align: center;">
+                                    <span class="badge badge-light">{{ r.performance.subject_count }}</span>
+                                </td>
+                                <td style="text-align: right;" class="font-mono">
+                                    {% if r.performance.subject_count > 0 %}
+                                        {{ r.performance.total_obtained }} / {{ r.performance.total_max }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;" class="font-mono">
+                                    {% if r.performance.subject_count > 0 %}
+                                        <strong>{{ r.performance.percentage }}%</strong>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if r.performance.subject_count > 0 %}
+                                        <span class="grade-badge grade-{{ r.performance.grade|lower|replace('+', '-plus') }} grade-sm">
+                                            {{ r.performance.grade }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if r.status == 'Pass' %}
+                                        <span class="status-pill status-pass">PASS</span>
+                                    {% elif r.status == 'Fail' %}
+                                        <span class="status-pill status-fail">FAIL</span>
+                                    {% else %}
+                                        <span class="status-pill status-pending">PENDING</span>
+                                    {% endif %}
+                                </td>
+                                <td class="print-hide" style="text-align: right;">
+                                    <div class="action-buttons-group">
+                                        <a href="{{ url_for('student_details', id=r.student.id) }}" class="btn btn-outline btn-xs" title="View Full Marksheet">
+                                            Details &rarr;
+                                        </a>
+                                        <a href="{{ url_for('add_marks', id=r.student.id) }}" class="btn btn-primary btn-xs" title="Add Subject Marks">
+                                            + Mark
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <p>No student records found matching the filter criteria.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

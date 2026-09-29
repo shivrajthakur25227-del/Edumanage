@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Marks - {{ student.name }} | Student Management System{% endblock %}
+{% block header_title %}Add Examination Marks{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title">Add Subject Marks</h1>
+            <p class="page-subtitle">Recording examination results for <strong class="text-primary">{{ student.name }}</strong> (Roll No: {{ student.roll_number }}).</p>
+        </div>
+        <div class="page-header-actions">
+            <a href="{{ url_for('student_details', id=student.id) }}" class="btn btn-outline">
+                <span>&larr; Back to Student Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Student Mini-Card Summary -->
+    <div class="card mini-student-card">
+        <div class="mini-student-info">
+            <div class="avatar-circle">{{ student.name[:2]|upper }}</div>
+            <div>
+                <h4 style="margin: 0; font-size: 1.1rem;">{{ student.name }}</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--text-muted);">
+                    Roll No: <span class="font-mono font-bold">{{ student.roll_number }}</span> • {{ student.course }} • Semester {{ student.semester }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card form-card" style="margin-top: 1.5rem;">
+        <form method="POST" action="{{ url_for('add_marks', id=student.id) }}" id="marksForm">
+            <div class="form-section-title">
+                <span class="section-number">📊</span>
+                <h3>Subject Marks Entry</h3>
+            </div>
+
+            <div class="form-grid">
+                <!-- Subject Name -->
+                <div class="form-group full-width">
+                    <label for="subject" class="form-label required">Subject Name</label>
+                    <input type="text" id="subject" name="subject" class="form-control" placeholder="e.g. Data Structures & Algorithms, Python Programming" list="commonSubjects" required>
+                    <datalist id="commonSubjects">
+                        <option value="Python Programming">
+                        <option value="Data Structures & Algorithms">
+                        <option value="Database Management Systems">
+                        <option value="Computer Networks">
+                        <option value="Operating Systems">
+                        <option value="Web Technologies">
+                        <option value="Software Engineering">
+                        <option value="Cloud Computing">
+                        <option value="Network Security">
+                        <option value="Machine Learning Fundamentals">
+                        <option value="Digital Electronics">
+                        <option value="Engineering Mathematics">
+                    </datalist>
+                    <span class="field-hint">Choose from common college subjects or type a custom subject name</span>
+                </div>
+
+                <!-- Marks Obtained -->
+                <div class="form-group">
+                    <label for="marks_obtained" class="form-label required">Marks Obtained</label>
+                    <input type="number" step="0.5" min="0" max="100" id="marks_obtained" name="marks_obtained" class="form-control" placeholder="e.g. 88.5" required>
+                    <span class="field-hint">Student's scored marks</span>
+                </div>
+
+                <!-- Maximum Marks -->
+                <div class="form-group">
+                    <label for="max_marks" class="form-label required">Maximum Marks</label>
+                    <input type="number" step="1" min="1" id="max_marks" name="max_marks" class="form-control" value="100" required>
+                    <span class="field-hint">Total maximum score (Standard: 100)</span>
+                </div>
+            </div>
+
+            <!-- Real-time Preview Calculation Box -->
+            <div class="preview-box" id="marksPreviewBox" style="display: none;">
+                <div class="preview-title">Real-time Calculation Preview:</div>
+                <div class="preview-metrics">
+                    <div>Percentage: <strong id="previewPercent">0%</strong></div>
+                    <div>Anticipated Grade: <strong id="previewGrade" class="badge badge-primary">A+</strong></div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <span>💾 Save Marks</span>
+                </button>
+                <a href="{{ url_for('student_details', id=student.id) }}" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Real-time marks percentage & grade calculation preview
+    const marksInput = document.getElementById('marks_obtained');
+    const maxMarksInput = document.getElementById('max_marks');
+    const previewBox = document.getElementById('marksPreviewBox');
+    const previewPercent = document.getElementById('previewPercent');
+    const previewGrade = document.getElementById('previewGrade');
+
+    function updatePreview() {
+        const obtained = parseFloat(marksInput.value);
+        const max = parseFloat(maxMarksInput.value);
+
+        if (!isNaN(obtained) && !isNaN(max) && max > 0 && obtained >= 0) {
+            if (obtained > max) {
+                marksInput.setCustomValidity('Marks obtained cannot exceed maximum marks.');
+                previewBox.style.display = 'none';
+            } else {
+                marksInput.setCustomValidity('');
+                const pct = (obtained / max) * 100;
+                previewPercent.innerText = pct.toFixed(1) + '%';
+
+                let grade = 'F';
+                if (pct >= 90) grade = 'A+';
+                else if (pct >= 80) grade = 'A';
+                else if (pct >= 70) grade = 'B';
+                else if (pct >= 60) grade = 'C';
+                else if (pct >= 50) grade = 'D';
+
+                previewGrade.innerText = grade;
+                previewBox.style.display = 'block';
+            }
+        } else {
+            previewBox.style.display = 'none';
+        }
+    }
+
+    marksInput.addEventListener('input', updatePreview);
+    maxMarksInput.addEventListener('input', updatePreview);
+</script>
+{% endblock %}

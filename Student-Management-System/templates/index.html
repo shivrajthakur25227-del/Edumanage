@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Student Management System{% endblock %}
+{% block header_title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Header & Quick Actions -->
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title">Welcome to Student Management Portal</h1>
+            <p class="page-subtitle">Real-time academic records, student enrollments, and examination overview.</p>
+        </div>
+        <div class="page-header-actions">
+            <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+                <span>➕ Add Student</span>
+            </a>
+            <a href="{{ url_for('students') }}" class="btn btn-outline">
+                <span>👥 View Directory</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-blue">
+                <span class="stat-icon">🎓</span>
+            </div>
+            <div class="stat-details">
+                <span class="stat-title">Total Students</span>
+                <span class="stat-value">{{ total_students }}</span>
+                <span class="stat-footnote">Active enrolled records</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-indigo">
+                <span class="stat-icon">👨</span>
+            </div>
+            <div class="stat-details">
+                <span class="stat-title">Male Students</span>
+                <span class="stat-value">{{ male_students }}</span>
+                <span class="stat-footnote">
+                    {% if total_students > 0 %}
+                        {{ ((male_students / total_students) * 100) | round(1) }}% of total
+                    {% else %}
+                        0%
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-pink">
+                <span class="stat-icon">👩</span>
+            </div>
+            <div class="stat-details">
+                <span class="stat-title">Female Students</span>
+                <span class="stat-value">{{ female_students }}</span>
+                <span class="stat-footnote">
+                    {% if total_students > 0 %}
+                        {{ ((female_students / total_students) * 100) | round(1) }}% of total
+                    {% else %}
+                        0%
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper stat-emerald">
+                <span class="stat-icon">📚</span>
+            </div>
+            <div class="stat-details">
+                <span class="stat-title">Offered Courses</span>
+                <span class="stat-value">{{ course_count }}</span>
+                <span class="stat-footnote">Academic departments</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Columns: Recent Students and Course Distribution -->
+    <div class="dashboard-grid">
+        <!-- Recent Students Card -->
+        <div class="card recent-students-card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h3>Recent Students</h3>
+                    <span class="badge badge-light">Latest 5 Entries</span>
+                </div>
+                <a href="{{ url_for('students') }}" class="card-header-link">View All &rarr;</a>
+            </div>
+
+            <div class="table-responsive">
+                {% if recent_students %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Course</th>
+                                <th>Sem</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in recent_students %}
+                                <tr>
+                                    <td><span class="badge badge-subtle">{{ student.roll_number }}</span></td>
+                                    <td>
+                                        <div class="student-name-cell">
+                                            <strong>{{ student.name }}</strong>
+                                            <span class="student-subtext">{{ student.email }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ student.course }}</td>
+                                    <td><span class="sem-badge">Sem {{ student.semester }}</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{{ url_for('student_details', id=student.id) }}" class="btn-action view" title="View Details">👁️</a>
+                                            <a href="{{ url_for('edit_student', id=student.id) }}" class="btn-action edit" title="Edit Student">✏️</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No students enrolled yet.</p>
+                        <a href="{{ url_for('add_student') }}" class="btn btn-primary btn-sm">Add First Student</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Course Breakdown Card -->
+        <div class="card course-breakdown-card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h3>Course Enrollment Distribution</h3>
+                    <span class="badge badge-light">By Degree</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                {% if course_distribution %}
+                    <div class="distribution-list">
+                        {% for item in course_distribution %}
+                            <div class="distribution-item">
+                                <div class="distribution-info">
+                                    <span class="distribution-course">{{ item.course }}</span>
+                                    <span class="distribution-count">{{ item.count }} {% if item.count == 1 %}student{% else %}students{% endif %}</span>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: {{ ((item.count / total_students) * 100) | round(0) }}%;"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No enrollment distribution data available.</p>
+                    </div>
+                {% endif %}
+
+                <!-- Quick Action Banners -->
+                <div class="quick-banner">
+                    <div class="quick-banner-text">
+                        <h4>Need to record exam marks?</h4>
+                        <p>Calculate grades and percentages automatically for any student.</p>
+                    </div>
+                    <a href="{{ url_for('results') }}" class="btn btn-sm btn-outline">Check Results</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

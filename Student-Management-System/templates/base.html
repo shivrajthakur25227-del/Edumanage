@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-mark">
+                    <span class="logo-icon">🎓</span>
+                    <div class="logo-text">
+                        <h2>EduManage</h2>
+                        <span class="logo-sub">Student Portal</span>
+                    </div>
+                </div>
+                <button class="mobile-close-btn" id="sidebarCloseBtn" aria-label="Close Sidebar">&times;</button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.path == '/' %}active{% endif %}">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('add_student') }}" class="nav-item {% if request.path == '/student/add' %}active{% endif %}">
+                    <span class="nav-icon">➕</span>
+                    <span>Add Student</span>
+                </a>
+                <a href="{{ url_for('students') }}" class="nav-item {% if request.path == '/students' %}active{% endif %}">
+                    <span class="nav-icon">👥</span>
+                    <span>All Students</span>
+                </a>
+                <a href="{{ url_for('results') }}" class="nav-item {% if request.path == '/results' %}active{% endif %}">
+                    <span class="nav-icon">📝</span>
+                    <span>Results</span>
+                </a>
+                <a href="{{ url_for('about') }}" class="nav-item {% if request.path == '/about' %}active{% endif %}">
+                    <span class="nav-icon">ℹ️</span>
+                    <span>About</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span class="status-label">SQLite Engine Active</span>
+                </div>
+                <div class="sys-version">v1.0.0 • Python Flask</div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper">
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggleBtn" aria-label="Toggle Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="breadcrumb-area">
+                        <span class="breadcrumb-root">College Portal</span>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">{% block header_title %}Dashboard{% endblock %}</span>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <span class="date-badge" id="currentDate">College Portal • 2026 Academic Year</span>
+                    <a href="{{ url_for('add_student') }}" class="btn btn-primary btn-sm topbar-btn">
+                        <span>+ Add Student</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Flash Alert Messages Container -->
+            <main class="content-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages" id="flashContainer">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible">
+                                    <span class="alert-icon">
+                                        {% if category == 'success' %}✓{% elif category == 'danger' %}⚠{% else %}ℹ{% endif %}
+                                    </span>
+                                    <span class="alert-text">{{ message }}</span>
+                                    <button class="alert-close" onclick="this.parentElement.remove();">&times;</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% if not_found %}
+                    <div class="card empty-state-card" style="text-align: center; padding: 3rem 1.5rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                        <h2>404 - Page Not Found</h2>
+                        <p style="color: var(--text-muted); margin: 0.5rem 0 1.5rem;">The page or student record you requested does not exist or has been removed.</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Return to Dashboard</a>
+                    </div>
+                {% else %}
+                    {% block content %}{% endblock %}
+                {% endif %}
+            </main>
+
+            <!-- Site Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 Student Management System • Developed for College Python Course Submission • Powered by Flask & SQLite</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}About Project | Student Management System{% endblock %}
+{% block header_title %}About This Project{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title">Student Management System</h1>
+            <p class="page-subtitle">College Python Programming Course Project & Academic Submission</p>
+        </div>
+    </div>
+
+    <div class="about-grid">
+        <!-- Overview Card -->
+        <div class="card about-main-card">
+            <div class="about-hero">
+                <span class="about-hero-icon">🎓</span>
+                <h2>Comprehensive College Student Management Portal</h2>
+                <p>
+                    A fully-functional, real-world educational record management platform architected using Python 3, Flask, and SQLite. Built to adhere strictly to clean code practices, security principles, and modern UX standards.
+                </p>
+            </div>
+
+            <div class="about-specs-grid">
+                <div class="spec-card">
+                    <span class="spec-icon">🐍</span>
+                    <h4>Python 3 & Flask</h4>
+                    <p>Lightweight WSGI backend utilizing clean MVC structure, modular helper functions, and REST-style routing.</p>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-icon">💾</span>
+                    <h4>Embedded SQLite3</h4>
+                    <p>Zero-configuration relational database with foreign key cascades, unique constraints, and parameterized SQL queries.</p>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-icon">🎨</span>
+                    <h4>Responsive UI & Jinja2</h4>
+                    <p>Accessible HTML5, modern flex/grid CSS variables, and Jinja2 template inheritance with zero paid framework dependencies.</p>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-icon">📊</span>
+                    <h4>Automated Grading Engine</h4>
+                    <p>Subject aggregation, percentage formula, and standardized college grading rubric with color-coded status badges.</p>
+                </div>
+            </div>
+
+            <div class="about-section" style="margin-top: 2rem;">
+                <h3>College Course Grading Formula</h3>
+                <p>The academic calculation strictly follows the university criteria below:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Percentage Range</th>
+                                <th>Grade</th>
+                                <th>Classification</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>90% – 100%</strong></td>
+                                <td><span class="badge badge-success">A+</span></td>
+                                <td>Outstanding Distinction</td>
+                                <td>Top tier performance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>80% – 89%</strong></td>
+                                <td><span class="badge badge-success">A</span></td>
+                                <td>Excellent</td>
+                                <td>First class with distinction</td>
+                            </tr>
+                            <tr>
+                                <td><strong>70% – 79%</strong></td>
+                                <td><span class="badge badge-info">B</span></td>
+                                <td>Very Good</td>
+                                <td>First class</td>
+                            </tr>
+                            <tr>
+                                <td><strong>60% – 69%</strong></td>
+                                <td><span class="badge badge-warning">C</span></td>
+                                <td>Good</td>
+                                <td>Higher second class</td>
+                            </tr>
+                            <tr>
+                                <td><strong>50% – 59%</strong></td>
+                                <td><span class="badge badge-warning">D</span></td>
+                                <td>Satisfactory</td>
+                                <td>Pass class</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Below 50%</strong></td>
+                                <td><span class="badge badge-danger">F</span></td>
+                                <td>Fail</td>
+                                <td>Remedial exam required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Project Architecture & Execution -->
+        <div class="card about-side-card">
+            <h3>Quick Launch Guide</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Run directly on your local terminal using standard Python commands:
+            </p>
+
+            <div class="code-block">
+                <code>
+# 1. Create Virtual Environment<br>
+python -m venv venv<br><br>
+# 2. Activate Environment<br>
+# Windows: venv\Scripts\activate<br>
+# Mac/Linux: source venv/bin/activate<br><br>
+# 3. Install Dependencies<br>
+pip install -r requirements.txt<br><br>
+# 4. Start Application<br>
+python app.py
+                </code>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <h4>Database Architecture</h4>
+                <ul class="clean-list">
+                    <li><strong>students</strong>: demographic records, unique roll numbers, and contact info.</li>
+                    <li><strong>marks</strong>: subject scores with foreign key <code>student_id</code> referencing students table.</li>
+                    <li><strong>Security</strong>: Parameterized queries protect completely against SQL injections.</li>
+                </ul>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                <h4>Sample Data</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    If needed, reset or populate demo students and marks with one click:
+                </p>
+                <a href="{{ url_for('trigger_sample_data') }}" class="btn btn-outline btn-sm" style="width: 100%; text-align: center;">
+                    🔄 Load Sample Students
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

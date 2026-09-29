@@ -1,0 +1,6 @@
+{
+  "name": "Student Management System",
+  "description": "Complete Python Flask & SQLite Student Management System with modern dashboard, student records, marksheets, responsive UI, and exportable project files.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

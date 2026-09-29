@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.name }} ({{ student.roll_number }}) | Student Details{% endblock %}
+{% block header_title %}Student Profile{% endblock %}
+
+{% block content %}
+<div class="details-container">
+    <!-- Header Navigation -->
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title">{{ student.name }}</h1>
+            <p class="page-subtitle">Roll Number: <span class="badge badge-primary font-mono">{{ student.roll_number }}</span> • {{ student.course }}</p>
+        </div>
+        <div class="page-header-actions">
+            <a href="{{ url_for('edit_student', id=student.id) }}" class="btn btn-outline">
+                <span>✏️ Edit Information</span>
+            </a>
+            <a href="{{ url_for('add_marks', id=student.id) }}" class="btn btn-primary">
+                <span>➕ Add Subject Marks</span>
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary print-hide">
+                <span>🖨️ Print Marksheet</span>
+            </button>
+            <a href="{{ url_for('students') }}" class="btn btn-secondary print-hide">
+                <span>&larr; Back</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Student Info Grid -->
+    <div class="profile-layout">
+        <!-- Left: Student Bio Card -->
+        <div class="card profile-info-card">
+            <div class="profile-badge-header">
+                <div class="avatar-large">{{ student.name[:2]|upper }}</div>
+                <div class="profile-main-title">
+                    <h2>{{ student.name }}</h2>
+                    <span class="profile-dept-tag">{{ student.department }}</span>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="info-list">
+                <div class="info-row">
+                    <span class="info-label">Roll Number</span>
+                    <span class="info-value font-mono font-bold">{{ student.roll_number }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email Address</span>
+                    <span class="info-value">{{ student.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contact Phone</span>
+                    <span class="info-value">{{ student.phone }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Gender</span>
+                    <span class="info-value">{{ student.gender }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date of Birth</span>
+                    <span class="info-value">{{ student.dob }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Degree Course</span>
+                    <span class="info-value">{{ student.course }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Department</span>
+                    <span class="info-value">{{ student.department }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Current Semester</span>
+                    <span class="info-value">Semester {{ student.semester }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Residential Address</span>
+                    <span class="info-value address-value">{{ student.address }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Enrolled On</span>
+                    <span class="info-value text-muted">{{ student.created_at }}</span>
+                </div>
+            </div>
+
+            <div class="profile-danger-zone print-hide">
+                <button type="button" class="btn btn-outline-danger btn-sm delete-student-btn" data-id="{{ student.id }}" data-name="{{ student.name }}" data-roll="{{ student.roll_number }}" style="width: 100%;">
+                    <span>🗑️ Delete Student Record</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Academic Marks & Results Card -->
+        <div class="card marks-card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <h3>Academic Performance & Marks</h3>
+                    <span class="badge badge-light">{{ performance.subject_count }} Subject(s)</span>
+                </div>
+                <a href="{{ url_for('add_marks', id=student.id) }}" class="btn btn-sm btn-primary print-hide">
+                    + Add Marks
+                </a>
+            </div>
+
+            <!-- Grade Metrics Bar -->
+            {% if performance.subject_count > 0 %}
+                <div class="performance-summary-grid">
+                    <div class="perf-metric-box">
+                        <span class="perf-metric-label">Total Marks</span>
+                        <span class="perf-metric-value">{{ performance.total_obtained }} / {{ performance.total_max }}</span>
+                    </div>
+
+                    <div class="perf-metric-box">
+                        <span class="perf-metric-label">Percentage</span>
+                        <span class="perf-metric-value">{{ performance.percentage }}%</span>
+                    </div>
+
+                    <div class="perf-metric-box">
+                        <span class="perf-metric-label">Letter Grade</span>
+                        <span class="grade-badge grade-{{ performance.grade|lower|replace('+', '-plus') }}">
+                            {{ performance.grade }}
+                        </span>
+                    </div>
+
+                    <div class="perf-metric-box">
+                        <span class="perf-metric-label">Overall Status</span>
+                        {% if performance.percentage >= 50.0 %}
+                            <span class="status-pill status-pass">PASSED</span>
+                        {% else %}
+                            <span class="status-pill status-fail">FAILED</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Marks Table -->
+                <div class="table-responsive" style="margin-top: 1.5rem;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th style="text-align: right;">Marks Scored</th>
+                                <th style="text-align: right;">Max Marks</th>
+                                <th style="text-align: right;">Percentage</th>
+                                <th style="text-align: center;">Subject Grade</th>
+                                <th class="print-hide" style="text-align: right; width: 80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mark in performance.marks %}
+                                {% set sub_percent = ((mark.marks_obtained / mark.max_marks) * 100) | round(1) %}
+                                <tr>
+                                    <td><strong>{{ mark.subject }}</strong></td>
+                                    <td style="text-align: right;" class="font-mono">{{ mark.marks_obtained }}</td>
+                                    <td style="text-align: right;" class="font-mono text-muted">{{ mark.max_marks }}</td>
+                                    <td style="text-align: right;" class="font-mono">{{ sub_percent }}%</td>
+                                    <td style="text-align: center;">
+                                        {% if sub_percent >= 90.0 %}
+                                            <span class="badge badge-success">A+</span>
+                                        {% elif sub_percent >= 80.0 %}
+                                            <span class="badge badge-success">A</span>
+                                        {% elif sub_percent >= 70.0 %}
+                                            <span class="badge badge-info">B</span>
+                                        {% elif sub_percent >= 60.0 %}
+                                            <span class="badge badge-warning">C</span>
+                                        {% elif sub_percent >= 50.0 %}
+                                            <span class="badge badge-warning">D</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">F</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="print-hide" style="text-align: right;">
+                                        <form method="POST" action="{{ url_for('delete_mark', student_id=student.id, mark_id=mark.id) }}" onsubmit="return confirm('Remove marks for subject {{ mark.subject }}?');">
+                                            <button type="submit" class="btn-action delete" title="Delete Mark Entry">🗑️</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-total-row">
+                                <th>Cumulative Total</th>
+                                <th style="text-align: right;" class="font-mono font-bold">{{ performance.total_obtained }}</th>
+                                <th style="text-align: right;" class="font-mono">{{ performance.total_max }}</th>
+                                <th style="text-align: right;" class="font-mono font-bold">{{ performance.percentage }}%</th>
+                                <th style="text-align: center;">
+                                    <span class="grade-badge grade-{{ performance.grade|lower|replace('+', '-plus') }} grade-sm">
+                                        {{ performance.grade }}
+                                    </span>
+                                </th>
+                                <th class="print-hide"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Grading Rubric Legend -->
+                <div class="grading-legend print-hide">
+                    <span class="legend-title">Grading Scale:</span>
+                    <span class="legend-item"><span class="badge badge-success">A+</span> 90-100%</span>
+                    <span class="legend-item"><span class="badge badge-success">A</span> 80-89%</span>
+                    <span class="legend-item"><span class="badge badge-info">B</span> 70-79%</span>
+                    <span class="legend-item"><span class="badge badge-warning">C</span> 60-69%</span>
+                    <span class="legend-item"><span class="badge badge-warning">D</span> 50-59%</span>
+                    <span class="legend-item"><span class="badge badge-danger">F</span> &lt; 50%</span>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3>No Examination Marks Recorded</h3>
+                    <p>There are currently no recorded grades or subject scores for {{ student.name }}.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="{{ url_for('add_marks', id=student.id) }}" class="btn btn-primary">
+                            <span>+ Add Examination Marks</span>
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-backdrop" id="deleteModal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>Confirm Student Deletion</h3>
+            <button class="modal-close" id="modalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to permanently delete <strong id="deleteStudentName"></strong> (<span id="deleteStudentRoll"></span>)?</p>
+            <p class="modal-warning">⚠️ This action cannot be undone. All examination marks and history for this student will also be removed.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+            <form method="POST" id="deleteStudentForm" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

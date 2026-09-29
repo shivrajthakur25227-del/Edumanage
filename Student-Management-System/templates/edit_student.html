@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student - {{ student.name }} | Student Management System{% endblock %}
+{% block header_title %}Edit Student Details{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title">Edit Student Information</h1>
+            <p class="page-subtitle">Update records for <strong class="text-primary">{{ student.name }}</strong> (Roll No: {{ student.roll_number }}).</p>
+        </div>
+        <div class="page-header-actions">
+            <a href="{{ url_for('student_details', id=student.id) }}" class="btn btn-outline">
+                <span>&larr; Cancel & Return</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="card form-card">
+        <form method="POST" action="{{ url_for('edit_student', id=student.id) }}" id="editStudentForm" novalidate>
+            <!-- Personal Information Section -->
+            <div class="form-section-title">
+                <span class="section-number">1</span>
+                <h3>Personal Information</h3>
+            </div>
+
+            <div class="form-grid">
+                <!-- Student Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label required">Student Full Name</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ student.name }}" required>
+                </div>
+
+                <!-- Roll Number -->
+                <div class="form-group">
+                    <label for="roll_number" class="form-label required">Roll Number</label>
+                    <input type="text" id="roll_number" name="roll_number" class="form-control" value="{{ student.roll_number }}" required style="text-transform: uppercase;">
+                    <span class="field-hint">Ensure roll number remains unique across students</span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label required">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" value="{{ student.email }}" required>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label for="phone" class="form-label required">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" value="{{ student.phone }}" required>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <label for="gender" class="form-label required">Gender</label>
+                    <select id="gender" name="gender" class="form-control" required>
+                        <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if student.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="form-group">
+                    <label for="dob" class="form-label required">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" class="form-control" value="{{ student.dob }}" required>
+                </div>
+            </div>
+
+            <!-- Academic Enrollment Section -->
+            <div class="form-section-title" style="margin-top: 2rem;">
+                <span class="section-number">2</span>
+                <h3>Academic & Enrollment Details</h3>
+            </div>
+
+            <div class="form-grid">
+                <!-- Course -->
+                <div class="form-group">
+                    <label for="course" class="form-label required">Degree Course</label>
+                    <select id="course" name="course" class="form-control" required>
+                        {% set courses = ['B.Tech Computer Science', 'B.Sc Information Tech', 'B.Tech Electronics', 'B.Tech Mechanical', 'B.Tech Civil', 'MCA', 'MBA'] %}
+                        {% for c in courses %}
+                            <option value="{{ c }}" {% if student.course == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Department -->
+                <div class="form-group">
+                    <label for="department" class="form-label required">Department</label>
+                    <select id="department" name="department" class="form-control" required>
+                        {% set depts = ['Computer Science & Engineering', 'Information Technology', 'Electronics & Communication', 'Mechanical Engineering', 'Civil Engineering', 'Management Studies'] %}
+                        {% for d in depts %}
+                            <option value="{{ d }}" {% if student.department == d %}selected{% endif %}>{{ d }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Semester -->
+                <div class="form-group">
+                    <label for="semester" class="form-label required">Current Semester</label>
+                    <select id="semester" name="semester" class="form-control" required>
+                        {% for sem in range(1, 9) %}
+                            <option value="{{ sem }}" {% if student.semester == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="form-section-title" style="margin-top: 2rem;">
+                <span class="section-number">3</span>
+                <h3>Residential Contact</h3>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="address" class="form-label required">Permanent Address</label>
+                <textarea id="address" name="address" class="form-control" rows="3" required>{{ student.address }}</textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <span>💾 Save Changes</span>
+                </button>
+                <a href="{{ url_for('student_details', id=student.id) }}" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
